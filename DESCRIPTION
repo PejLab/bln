@@ -1,11 +1,20 @@
 Package: bln
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Binomial Logit Normal Distribution
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Date: 2018-05-07
+Authors@R:  c(
+  person(given = 'Pejman', family = 'Mohammadi', email = 'user@example.com', role = 'aut'),
+  person(given = 'Paul', family = 'Hoffman', email = 'phoffman@nygenome.org', role = c('aut', 'cre')),
+  person(given = 'Tuuli', family = 'Lappalainen', email = 'tlappalainen@nygenome.org', role = 'aut')
+  )
+Description: An implementation of the binomial logit normal distribution in R
+URL: https://github.com/mojaveazure/bln
+BugReports: https://github.com/mojaveazure/bln/issues
+License: MIT
 Encoding: UTF-8
 LazyData: true
+Collate: 
+    'utilities.R'
+    'bln.R'
+RoxygenNote: 6.0.1
