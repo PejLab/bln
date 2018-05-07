@@ -1,21 +1,18 @@
-# Calculate the binomial coefficent
-#
-# @param k Number of observations
-# @param n Number of trials
-#
-# @return Binomial coefficients, any values of NaN will be changed to a 1
-#
-binom <- function(k, n) {
-  coefs <- mapply(
-    FUN = function(k.use, n.use) {
-      return(factorial(x = n.use) / (factorial(x = k.use) * factorial(x = n.use - k.use)))
-    },
-    k.use = k,
-    n.use = n
-  )
-  coefs[is.nan(x = coefs)] <- 1
-  return(coefs)
-}
+# binom variables
+# x, q <- quantiles (d, p)
+# p <- probabilities (q)
+# n <- number of observations (r)
+# size <- number of trials (all)
+# prob <- probabilitiy of success (all)
+# lower.tail <- P[X <= x], else P[X > x] (p, q)
+
+# norm variables
+# x, q <- quantiles (d, p)
+# p <- probabilities (q)
+# n <- number of observations (r)
+# mean <- means (all)
+# sd <- stdevs (all)
+# lower.tail <- P[X <= x], else P[X > x] (p, q)
 
 # Perform logit transformation
 #
@@ -59,27 +56,27 @@ normexp <- function(x, mean, sd) {
   return(exp(x = -((x - mean) ^ 2) / (2 * (sd ^ 2))))
 }
 
+# Calculate the integral part of the BLN distribution formula
+#
+# @param r The binomial ratio for x
+# @param x A binomial distributed variable
+# @param size Number of trials (\code{n})
+# @param mean Mean of the normal distribution
+# @param sd Standard deviation of the normal distribution
+#
+# @return
+#
 blnratio <- function(r, x, size, mean, sd) {
-  a <- r ^ (x - 1)
-  b <- (1 - r) ^ (size - x - 1)
-  c <- normexp(x = logit(x = r), mean = mean, sd = sd)
-  return(a * b * c)
+  return(
+    (r ^ (x - 1)) *
+      ((1 - r) ^ (size - x - 1)) *
+      normexp(x = logit(x = r), mean = mean, sd = sd)
+  )
 }
 
-# betalogitnormal <- function(x, mean = 0, sd = 1, size) {
-#   num.integrate <- 100
-#   variance <- sd ^ 2
-#   tau <- 2 * pi
-#   if (variance < 1e-3) {
-#     warning("Variance is less than 1e-3, giving binomial probability")
-#     return(dbinom(x = x, size = size, prob = logistic(x = mean)))
-#   }
-#   xc <- size - x
-#   z <- lgamma(x = size + 1) - lgamma(x = x + 1) - lgamma(x = xc + 1) - log(x = tau * variance) * 0.5
-#   rd <- seq.int(from = 0, to = 1, by = num.integrate + 1)
-#   rd <- rd + ((rd[2] - rd[1]) / 2)
-#   rd <- rd[1:num.integrate]
-# }
+# Proof of concept stuff
+# Not used for anything other than
+# sanity checks and testing things
 
 # Normal PDF function
 #
@@ -120,4 +117,9 @@ normcdf <- function(q, mean = 0, sd = 1) {
   probs <- unlist(x = probs[1, ])
   names(x = probs) <- NULL
   return(normfactor(sd = sd) * probs)
+}
+
+normqf <- function(p, mean = 0, sd = 1) {
+  expr <- expression()
+  invisible(x = NULL)
 }

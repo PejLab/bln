@@ -25,9 +25,10 @@ rbln(n, size, mean = 0, sd = 1)
 
 \item{sd}{A vector of standard deviations}
 
-\item{n}{...}
+\item{n}{Number of observations, if \code{length(x = n) > 1},
+the length is taken to be the number required}
 
-\item{prob}{...}
+\item{p}{A vector of probabilities}
 }
 \value{
 \code{dbln} gives the density
@@ -40,4 +41,9 @@ rbln(n, size, mean = 0, sd = 1)
 }
 \description{
 The Binomial-Logit-Normal Distribution
+}
+\details{
+\deqn{
+  \binom{x}{n}
+}
 }
