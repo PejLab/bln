@@ -3,7 +3,7 @@ Type: Package
 Title: Binomial Logit Normal Distribution
 Version: 0.1.0
 Date: 2018-05-07
-Authors@R:  c(
+Authors@R: c(
   person(given = 'Pejman', family = 'Mohammadi', email = 'user@example.com', role = 'aut'),
   person(given = 'Paul', family = 'Hoffman', email = 'phoffman@nygenome.org', role = c('aut', 'cre')),
   person(given = 'Tuuli', family = 'Lappalainen', email = 'tlappalainen@nygenome.org', role = 'aut')
@@ -15,6 +15,6 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 Collate: 
-    'utilities.R'
+    'internal.R'
     'bln.R'
 RoxygenNote: 6.0.1

@@ -1,4 +1,4 @@
-#' @include utilities.R
+#' @include internal.R
 #'
 NULL
 
