@@ -4,11 +4,6 @@ NULL
 
 #' The Binomial-Logit-Normal Distribution
 #'
-#' @details
-#' \deqn{
-#'   \binom{x}{n}
-#' }
-#'
 #' @param x,q A vector of quantiles
 #' @param p A vector of probabilities
 #' @param n Number of observations, if \code{length(x = n) > 1},
@@ -19,6 +14,7 @@ NULL
 #'
 #' @rdname bln
 #' @name Binomial-logit-normal
+#' @aliases bln
 #'
 NULL
 

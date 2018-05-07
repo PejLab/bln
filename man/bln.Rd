@@ -2,6 +2,7 @@
 % Please edit documentation in R/bln.R
 \name{Binomial-logit-normal}
 \alias{Binomial-logit-normal}
+\alias{bln}
 \alias{dbln}
 \alias{pbln}
 \alias{qbln}
@@ -41,9 +42,4 @@ the length is taken to be the number required}
 }
 \description{
 The Binomial-Logit-Normal Distribution
-}
-\details{
-\deqn{
-  \binom{x}{n}
-}
 }
