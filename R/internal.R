@@ -1,19 +1,3 @@
-# binom variables
-# x, q <- quantiles (d, p)
-# p <- probabilities (q)
-# n <- number of observations (r)
-# size <- number of trials (all)
-# prob <- probabilitiy of success (all)
-# lower.tail <- P[X <= x], else P[X > x] (p, q)
-
-# norm variables
-# x, q <- quantiles (d, p)
-# p <- probabilities (q)
-# n <- number of observations (r)
-# mean <- means (all)
-# sd <- stdevs (all)
-# lower.tail <- P[X <= x], else P[X > x] (p, q)
-
 # Perform logit transformation
 #
 # @param x A numeric vector
@@ -114,12 +98,27 @@ normcdf <- function(q, mean = 0, sd = 1) {
       lower = -Inf
     )
   )
-  probs <- unlist(x = probs[1, ])
-  names(x = probs) <- NULL
+  probs <- unlist(x = probs[1, ], use.names = FALSE)
   return(normfactor(sd = sd) * probs)
 }
 
+
+erf <- function(x) {
+  probs <- mapply(
+    FUN = integrate,
+    upper = x,
+    MoreArgs = c(
+      f = function(t) {
+        return(exp(x = -(t ^ 2)))
+      },
+      lower = 0
+    )
+  )
+  probs <- unlist(x = probs[1, ], use.names = FALSE)
+  return((2 / sqrt(x = pi)) * probs)
+}
+
 normqf <- function(p, mean = 0, sd = 1) {
-  expr <- expression()
+  expr <- expression(exp(x = -((x - mean) ^ 2) / (2 * (sd ^ 2))))
   invisible(x = NULL)
 }

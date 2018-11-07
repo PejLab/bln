@@ -13,7 +13,7 @@ dbln(x, size, mean = 0, sd = 1)
 
 pbln(q, size, mean = 0, sd = 1)
 
-qbln(...)
+qbln(p, size, mean = 0, sd = 1)
 
 rbln(n, size, mean = 0, sd = 1)
 }
@@ -26,10 +26,10 @@ rbln(n, size, mean = 0, sd = 1)
 
 \item{sd}{A vector of standard deviations}
 
+\item{p}{A vector of probabilities}
+
 \item{n}{Number of observations, if \code{length(x = n) > 1},
 the length is taken to be the number required}
-
-\item{p}{A vector of probabilities}
 }
 \value{
 \code{dbln} gives the density
@@ -41,5 +41,7 @@ the length is taken to be the number required}
 \code{rbln} generates random deviates
 }
 \description{
-The Binomial-Logit-Normal Distribution
+Density, distribution function, quantile function, and random generation for
+the binomial-logit-normal distribution with mean equal to \code{mean} and
+standard deviation equal to \code{sd}, as well as distribution parameter \code{size}.
 }

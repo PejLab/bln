@@ -4,6 +4,10 @@ NULL
 
 #' The Binomial-Logit-Normal Distribution
 #'
+#' Density, distribution function, quantile function, and random generation for
+#' the binomial-logit-normal distribution with mean equal to \code{mean} and
+#' standard deviation equal to \code{sd}, as well as distribution parameter \code{size}.
+#'
 #' @param x,q A vector of quantiles
 #' @param p A vector of probabilities
 #' @param n Number of observations, if \code{length(x = n) > 1},
@@ -92,9 +96,7 @@ pbln <- function(q, size, mean = 0, sd = 1) {
       upper = 1
     )
   )
-  probs <- unlist(x = probs[1, ])
-  names(x = probs) <- NULL
-  #
+  probs <- unlist(x = probs[1, ], use.names = FALSE)
   return(choose(n = size, k = q) * normfactor(sd = sd) * probs)
 }
 
@@ -104,7 +106,8 @@ pbln <- function(q, size, mean = 0, sd = 1) {
 #' @return \code{qbln} gives the quantile function
 #' @export
 #'
-qbln <- function(...) {
+qbln <- function(p, size, mean = 0, sd = 1) {
+  .NotYetImplemented()
   E <- expression(
     r ^ (x - 1) *
       (1 - r) ^ (size - x - 1) *

@@ -1,14 +1,14 @@
 Package: bln
 Type: Package
 Title: Binomial Logit Normal Distribution
+Description: An implementation of the binomial logit normal distribution in R.
 Version: 0.1.0
-Date: 2018-05-07
+Date: 2018-11-07
 Authors@R: c(
   person(given = 'Pejman', family = 'Mohammadi', email = 'user@example.com', role = 'aut'),
   person(given = 'Paul', family = 'Hoffman', email = 'phoffman@nygenome.org', role = c('aut', 'cre')),
   person(given = 'Tuuli', family = 'Lappalainen', email = 'tlappalainen@nygenome.org', role = 'aut')
   )
-Description: An implementation of the binomial logit normal distribution in R
 URL: https://github.com/mojaveazure/bln
 BugReports: https://github.com/mojaveazure/bln/issues
 License: MIT
@@ -17,4 +17,4 @@ LazyData: true
 Collate: 
     'internal.R'
     'bln.R'
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
