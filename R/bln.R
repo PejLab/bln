@@ -31,7 +31,8 @@ NULL
 #'
 dbln <- function(x, size, mean = 0, sd = 1) {
   # Equalize lengths
-  length.use <- max(sapply(X = list(x, size, mean, sd), FUN = length))
+  # length.use <- max(sapply(X = list(x, size, mean, sd), FUN = length))
+  length.use <- max.length(x, size, mean, sd)
   x <- rep_len(x = x, length.out = length.use)
   size <- rep_len(x = size, length.out = length.use)
   mean <- rep_len(x = mean, length.out = length.use)
@@ -78,7 +79,8 @@ dbln <- function(x, size, mean = 0, sd = 1) {
 #'
 pbln <- function(q, size, mean = 0, sd = 1) {
   # Equalize lengths
-  length.use <- max(sapply(X = list(q, size, mean, sd), FUN = length))
+  # length.use <- max(sapply(X = list(q, size, mean, sd), FUN = length))
+  length.use <- max.length(q, size, mean, sd)
   q <- rep_len(x = q, length.out = length.use)
   size <- rep_len(x = size, length.out = length.use)
   mean <- rep_len(x = mean, length.out = length.use)

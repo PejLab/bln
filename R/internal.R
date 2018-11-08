@@ -36,6 +36,16 @@ logit <- function(x) {
   return(log(x = x / (1 - x)))
 }
 
+# Determine the largest length out of many vectors
+#
+# @param ... One or more vectors
+#
+# @return The maximal length of all vectors passed
+#
+max.length <- function(...) {
+  return(max(vapply(X = list(...), FUN = length, FUN.VALUE = numeric(length = 1L))))
+}
+
 # Calculate the expoent part of a normal distribution
 #
 # @param x The value where the normal distribution is as
