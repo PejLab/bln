@@ -36,37 +36,77 @@ dbln <- function(x, size, mean = 0, sd = 1) {
   size <- rep_len(x = size, length.out = length.use)
   mean <- rep_len(x = mean, length.out = length.use)
   sd <- rep_len(x = sd, length.out = length.use)
+  results <- vector(mode = 'numeric', length = length.use)
   # Some constants
-  num.integrate <- 100
+  num.integrate <- 250
   variance <- sd ^ 2
-  tau <- 2 * pi
-  if (any(variance < 1e-3)) {
-    warning("Variance is less than 1e-3, giving binomial probability")
-    return(dbinom(x = x, size = size, prob = logistic(x = mean)))
-  }
-  xc <- size - x
-  z <- lgamma(x = size + 1) - lgamma(x = x + 1) - lgamma(x = xc + 1)
-  z <- z - (log(x = tau * variance) * 0.5)
+  # tau <- 2 * pi
   rd <- seq.int(from = 0, to = 1, length.out = num.integrate + 1)
   rd <- rd + ((rd[2] - rd[1]) / 2)
   rd <- rd[1:num.integrate]
-  return(mapply(
-    FUN = function(r, x.use, xc.use, mean.use, variance.use, z.use) {
+  too.small <- which(x = variance < 1e-3)
+  if (length(x = too.small) > 0) {
+    warning("Variance is less than 1e-3, giving binomial probability")
+  }
+  for (i in 1:length.use) {
+    if (i %in% too.small) {
+      results[i] <- dbinom(x = x[i], size = size[i], prob = logistic(x = mean[i]))
+    } else {
+      xc <- size[i] - x[i]
+      z <- lgamma(x = size[i] + 1) - lgamma(x = x[i] + 1) - lgamma(x = xc + 1)
+      z <- z - (log(x = 2 * pi * variance[i]) * 0.5)
       f <- exp(
-        x = (log(x = r) * (x.use - 1)) +
-          (log(x = 1 - r) * (xc.use - 1)) -
-          (((logit(x = r) - mean.use) ^ 2) / (2 * variance.use)) +
-          z.use
+        x = (log(x = rd) * (x[i] - 1)) +
+          (log(x = 1 - rd) * (xc - 1)) -
+          (((logit(x = rd) - mean[i]) ^ 2) / (2 * variance[i])) +
+          z
       )
-      return(exp(x = -log(x = num.integrate) + log(x = sum(f))))
-    },
-    x.use = x,
-    xc.use = xc,
-    mean.use = mean,
-    variance.use = variance,
-    z.use = z,
-    MoreArgs = list(r = rd)
-  ))
+      results[i] <- exp(x = -log(x = num.integrate) + log(x = sum(f)))
+    }
+  }
+  #   results[too.small] <- dbinom(
+  #     x = x[too.small],
+  #     size = size[too.small],
+  #     prob = logistic(x = mean[too.small])
+  #   )
+  #   x <- x[-too.small]
+  #   size <- size[-too.small]
+  #   mean <- mean[-too.small]
+  #   sd <- sd[-too.small]
+  #   variance <- variance[-too.small]
+  # }
+  # if (length(x = too.small) == length.use) {
+  #   return(results)
+  # }
+  # xc <- size - x
+  # z <- lgamma(x = size + 1) - lgamma(x = x + 1) - lgamma(x = xc + 1)
+  # z <- z - (log(x = tau * variance) * 0.5)
+  # rd <- seq.int(from = 0, to = 1, length.out = num.integrate + 1)
+  # rd <- rd + ((rd[2] - rd[1]) / 2)
+  # rd <- rd[1:num.integrate]
+  # px <- mapply(
+  #   FUN = function(r, x.use, xc.use, mean.use, variance.use, z.use) {
+  #     f <- exp(
+  #       x = (log(x = r) * (x.use - 1)) +
+  #         (log(x = 1 - r) * (xc.use - 1)) -
+  #         (((logit(x = r) - mean.use) ^ 2) / (2 * variance.use)) +
+  #         z.use
+  #     )
+  #     return(exp(x = -log(x = num.integrate) + log(x = sum(f))))
+  #   },
+  #   x.use = x,
+  #   xc.use = xc,
+  #   mean.use = mean,
+  #   variance.use = variance,
+  #   z.use = z,
+  #   MoreArgs = list(r = rd)
+  # )
+  # if (length(x = too.small) > 0) {
+  #   results[-too.small] <- px
+  # } else {
+  #   results <- px
+  # }
+  return(results)
 }
 
 # Probability function (CDF)
