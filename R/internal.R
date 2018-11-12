@@ -1,13 +1,3 @@
-# Perform logit transformation
-#
-# @param x A numeric vector
-#
-# @return A vector of the same length as \code{x} containing transformed values
-#
-logit <- function(x) {
-  return(log(x = x / (1 - x)))
-}
-
 # Perform logistic transformation
 #
 # @param x A numeric vector
@@ -18,6 +8,16 @@ logistic <- function(x) {
   return(1 / (1 + exp(x = -x)))
 }
 
+# Perform logit transformation
+#
+# @param x A numeric vector
+#
+# @return A vector of the same length as \code{x} containing transformed values
+#
+logit <- function(x) {
+  return(log(x = x / (1 - x)))
+}
+
 # Calculate the area factor for a normal distribution
 #
 # @param sd A standard deviation
@@ -26,18 +26,6 @@ logistic <- function(x) {
 #
 normfactor <- function(sd) {
   return(1 / sqrt(x = 2 * pi * (sd ^ 2)))
-}
-
-# Calculate the expoent part of a normal distribution
-#
-# @param x The value where the normal distribution is as
-# @param mean The mean of the normal distribution
-# @param The value of the distribution
-#
-# @return The calculated exponent part of the normal distribution
-#
-normexp <- function(x, mean, sd) {
-  return(exp(x = -((x - mean) ^ 2) / (2 * (sd ^ 2))))
 }
 
 # Calculate the integral part of the BLN distribution formula
@@ -54,13 +42,25 @@ blnratio <- function(r, x, size, mean, sd) {
   return(
     (r ^ (x - 1)) *
       ((1 - r) ^ (size - x - 1)) *
-      normexp(x = logit(x = r), mean = mean, sd = sd)
+      exp(x = -((logit(x = r) - mean) ^ 2) / (2 * (sd ^ 2)))
   )
 }
 
 # Proof of concept stuff
 # Not used for anything other than
 # sanity checks and testing things
+
+# Calculate the expoent part of a normal distribution
+#
+# @param x The value where the normal distribution is as
+# @param mean The mean of the normal distribution
+# @param The value of the distribution
+#
+# @return The calculated exponent part of the normal distribution
+#
+normexp <- function(x, mean, sd) {
+  return(exp(x = -((x - mean) ^ 2) / (2 * (sd ^ 2))))
+}
 
 # Normal PDF function
 #
