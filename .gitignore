@@ -1,4 +1,17 @@
+# Ignore directories
+inst/doc
+.vscode/
+
+# Ignore R/Rstudio stuff
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+# Ignore compiled objects
+*.o
+*.so
+
+# Ignore built vignettes
+*.html
+vignettes/*.R
