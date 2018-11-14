@@ -89,7 +89,8 @@ system.time(
     x = matlab$x,
     size = matlab$x + matlab$xc,
     mean = matlab$mu,
-    sd = sqrt(x = matlab$v)
+    sd = sqrt(x = matlab$v),
+    drop = NULL
   )
 )
 plot(
@@ -99,7 +100,7 @@ plot(
 )
 ```
 
-```{r cpp_approx}
+```{r cpp_approx, eval=FALSE, echo=FALSE}
 # Using the same x, size (x + xc), mean, and standard deviations,
 # run the approximate BLN PDF C++ code
 system.time(
@@ -121,11 +122,12 @@ plot(
 # Using the same x, size (x + xc), mean, and standard deviations
 # run the exact BLN PDF R code
 system.time(
-  expr = r.exact <- dblnx(
+  expr = r.exact <- dbln(
     x = matlab$x,
     size = matlab$x + matlab$xc,
     mean = matlab$mu,
-    sd = sqrt(x = matlab$v)
+    sd = sqrt(x = matlab$v),
+    drop = FALSE
   )
 )
 plot(

@@ -22,6 +22,27 @@ test_that(
       sd = sqrt(x = matlab$v)
     )
     expect_length(object = r.approx, n = nrow(x = matlab))
-    expect_equal(object = cor(x = r.approx, y = matlab$px), expected = 1)
+    expect_equal(
+      object = round(x = cor(x = r.approx, y = matlab$px)),
+      expected = 1
+    )
+  }
+)
+
+test_that(
+  desc = "dbln calculates accurate PDF correctly",
+  code = {
+    r.exact <- dbln(
+      x = matlab$x,
+      size = matlab$x + matlab$xc,
+      mean = matlab$mu,
+      sd = sqrt(x = matlab$v),
+      drop = FALSE
+    )
+    expect_length(object = r.exact, n = nrow(x = matlab))
+    expect_equal(
+      object = round(x = cor(x = r.exact, y = matlab$px)),
+      expected = 1
+    )
   }
 )

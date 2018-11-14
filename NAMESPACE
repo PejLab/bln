@@ -2,11 +2,11 @@
 
 export(dbln)
 export(dblnpp)
-export(dblnx)
-export(dblnxpp)
 export(pbln)
 export(qbln)
 export(rbln)
+importFrom(pracma,eps)
+importFrom(pracma,erf)
 importFrom(stats,dbinom)
 importFrom(stats,integrate)
 importFrom(stats,rbinom)

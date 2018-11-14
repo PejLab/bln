@@ -36,6 +36,23 @@ fxpdf <- function(ratio, x, xc, mean, variance, z) {
   ))
 }
 
+# The logit-normal CDF
+#
+# @param q A vector of quantiles
+# @param mean A vector of means
+# @param sd A vector of standard deviations
+#
+# @return \code{pln} gives the distribution function
+#
+#' @importFrom pracma erf
+#
+pln <- function(q, mean = 0, sd = 1) {
+  px <- 0.5 * (1 + erf(x = (logit(x = q) - mean) / (sd * sqrt(x = 2))))
+  px[q <= 0] <- 0
+  px[q >= 1] <- 1
+  return(px)
+}
+
 # Perform logistic transformation
 #
 # @param x A numeric vector
@@ -132,20 +149,20 @@ normcdf <- function(q, mean = 0, sd = 1) {
   return(normfactor(sd = sd) * probs)
 }
 
-erf <- function(x) {
-  probs <- mapply(
-    FUN = integrate,
-    upper = x,
-    MoreArgs = c(
-      f = function(t) {
-        return(exp(x = -(t ^ 2)))
-      },
-      lower = 0
-    )
-  )
-  probs <- unlist(x = probs[1, ], use.names = FALSE)
-  return((2 / sqrt(x = pi)) * probs)
-}
+# erf <- function(x) {
+#   probs <- mapply(
+#     FUN = integrate,
+#     upper = x,
+#     MoreArgs = c(
+#       f = function(t) {
+#         return(exp(x = -(t ^ 2)))
+#       },
+#       lower = 0
+#     )
+#   )
+#   probs <- unlist(x = probs[1, ], use.names = FALSE)
+#   return((2 / sqrt(x = pi)) * probs)
+# }
 
 normqf <- function(p, mean = 0, sd = 1) {
   expr <- expression(exp(x = -((x - mean) ^ 2) / (2 * (sd ^ 2))))

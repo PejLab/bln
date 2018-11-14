@@ -16,6 +16,8 @@ NULL
 #' @param size Number of trials
 #' @param mean A vector of means
 #' @param sd A vector of standard deviations
+#' @param drop Drop the binomial coefficient? If \code{FALSE}, calculates the
+#' normalized value. If \code{NULL}, calculates the approximated value.
 #'
 #' @rdname bln
 #' @name Binomial-logit-normal
@@ -27,10 +29,11 @@ NULL
 #' @rdname bln
 #' @aliases dbln
 #' @return \code{dbln} gives the density
+#' @importFrom pracma eps
 #' @importFrom stats dbinom
 #' @export
 #'
-dbln <- function(x, size, mean = 0, sd = 1) {
+dbln <- function(x, size, mean = 0, sd = 1, drop = NULL) {
   # Equalize lengths
   length.use <- max.length(x, size, mean, sd)
   x <- rep_len(x = x, length.out = length.use)
@@ -41,78 +44,107 @@ dbln <- function(x, size, mean = 0, sd = 1) {
   # Some constants
   num.integrate <- 250
   variance <- sd ^ 2
+  min.var <- eps()
+  xc <- size - x
+  z <- if (isTRUE(x = drop)) {
+    rep_len(x = 0, length.out = length.use)
+  } else {
+    lgamma(x = size + 1) - lgamma(x = x + 1) - lgamma(x = xc + 1)
+  }
+  dx <- seq.int(
+    from = 0,
+    to = 1,
+    length.out = ifelse(test = is.null(x = drop), yes = num.integrate, no = 1000)
+  )
+  too.small <- which(x = variance < min.var)
   # Do shit
-  rd <- seq.int(from = 0, to = 1, length.out = num.integrate + 1)
-  rd <- rd + ((rd[2] - rd[1]) / 2)
-  rd <- rd[1:num.integrate]
-  too.small <- which(x = variance < 1e-3)
   if (length(x = too.small) > 0) {
-    warning("One or more variance values is less than 1e-3, giving binomial probability")
+    warning("One or more variance values is less than ", min.var, ", giving binomial probability")
   }
   for (i in 1:length.use) {
-    if (i %in% too.small) {
-      results[i] <- dbinom(x = x[i], size = size[i], prob = logistic(x = mean[i]))
+    results[i] <- if (i %in% too.small) {
+      dbinom(x = x[i], size = size[i], prob = logistic(x = mean[i]))
     } else {
-      xc <- size[i] - x[i]
-      z <- lgamma(x = size[i] + 1) - lgamma(x = x[i] + 1) - lgamma(x = xc + 1)
-      z <- z - (log(x = 2 * pi * variance[i]) * 0.5)
-      f <- fxpdf(
-        ratio = rd,
-        x = x[i],
-        xc = xc,
-        mean = mean[i],
-        variance = variance[i],
-        z = z
-      )
-      results[i] <- exp(x = -log(x = num.integrate) + log(x = sum(f)))
+      tpx <- pln(q = dx, mean = mean[i], sd = sd[i])
+      lower <- max(dx[tpx < eps()])
+      upper <- min(dx[tpx > (1 - eps())])
+      if (is.null(x = drop)) {
+        rd <- seq.int(from = lower, to = upper, length.out = num.integrate + 1)
+        rd <- rd + ((rd[2] - rd[1]) / 2)
+        rd <- rd[1:(length(x = rd) - 1)]
+        f <- fxpdf(
+          ratio = rd,
+          x = x[i],
+          xc = xc[i],
+          mean = mean[i],
+          variance = variance[i],
+          z = z[i] - (log(x = 2 * pi * variance[i]) * 0.5)
+        )
+        exp(x = -log(x = num.integrate / (upper - lower)) + log(x = sum(f)))
+      } else {
+        probs <- integrate(
+          f = fxpdf,
+          lower = lower,
+          upper = upper,
+          x = x[i],
+          xc = xc[i],
+          mean = mean[i],
+          variance = variance[i],
+          z = z[i],
+          rel.tol = 1e-4,
+          abs.tol = 0
+        )
+        1 / sqrt(x = 2 * pi * variance[i]) * probs$value
+      }
     }
   }
   return(results)
 }
 
-#' @rdname bln
-#' @aliases dblnx
-#' @references \code{dblnx} gives the exact density
-#' @export
-#'
-dblnx <- function(x, size, mean = 0, sd = 1, drop = FALSE) {
-  # Equalize lengths
-  length.use <- max.length(x, size, mean, sd)
-  x <- rep_len(x = x, length.out = length.use)
-  size <- rep_len(x = size, length.out = length.use)
-  mean <- rep_len(x = mean, length.out = length.use)
-  sd <- rep_len(x = sd, length.out = length.use)
-  xc <- size - x
-  # Some constants
-  variance <- sd ^ 2
-  # Do shit
-  too.small <- which(x = variance < 1e-3)
-  if (length(x = too.small) > 0) {
-    warning("One or more variance values is less than 1e-3, giving binomial probability")
-  }
-  z <- if (drop) {
-    0
-  } else {
-    lgamma(x = size + 1) - lgamma(x + 1) - lgamma(x = xc + 1)
-  }
-  probs <- mapply(
-    FUN = integrate,
-    x = x,
-    xc = xc,
-    mean = mean,
-    variance = variance,
-    z = z,
-    MoreArgs = list(
-      f = fxpdf,
-      lower = 0,
-      upper = 1,
-      rel.tol = 1e-4,
-      abs.tol = 0
-    )
-  )
-  probs <- 1 / sqrt(x = 2 * pi * variance) * unlist(x = probs[1, ], use.names = FALSE)
-  return(probs)
-}
+# @rdname bln
+# @aliases dblnx
+# @references \code{dblnx} gives the exact density
+# @export
+#
+# dblnx <- function(x, size, mean = 0, sd = 1, drop = FALSE) {
+#   # Equalize lengths
+#   length.use <- max.length(x, size, mean, sd)
+#   x <- rep_len(x = x, length.out = length.use)
+#   size <- rep_len(x = size, length.out = length.use)
+#   mean <- rep_len(x = mean, length.out = length.use)
+#   sd <- rep_len(x = sd, length.out = length.use)
+#   xc <- size - x
+#   # Some constants
+#   variance <- sd ^ 2
+#   min.var <- eps()
+#   # Do shit
+#   too.small <- which(x = variance < min.var)
+#   if (length(x = too.small) > 0) {
+#     warning("One or more variance values is less than ", min.var, ", giving binomial probability")
+#   }
+#   z <- if (drop) {
+#     0
+#   } else {
+#     lgamma(x = size + 1) - lgamma(x + 1) - lgamma(x = xc + 1)
+#   }
+#   probs <- mapply(
+#     FUN = integrate,
+#     x = x,
+#     xc = xc,
+#     mean = mean,
+#     variance = variance,
+#     z = z,
+#     MoreArgs = list(
+#       f = fxpdf,
+#       lower = 0,
+#       upper = 1,
+#       rel.tol = 1e-4,
+#       abs.tol = 0
+#     )
+#   )
+#   probs <- unlist(x = probs[1, ], use.names = FALSE)
+#   return(1 / sqrt(x = 2 * pi * variance) * probs)
+# }
 
 #' @rdname bln
 #' @aliases dblnpp
@@ -126,20 +158,21 @@ dblnpp <- function(x, size, mean = 0, sd = 1) {
   size <- rep_len(x = size, length.out = length.use)
   mean <- rep_len(x = mean, length.out = length.use)
   sd <- rep_len(x = sd, length.out = length.use)
-  if (any(sd ^ 2 < 1e-3)) {
-    warning("One or more variance values is less than 1e-3, giving binomial probability")
+  min.var <- eps()
+  if (any(sd ^ 2 < min.var)) {
+    warning("One or more variance values is less than ", min.var, ", giving binomial probability")
   }
   return(blnpdf(x = x, size = size, mean = mean, sd = sd))
 }
 
-#' @rdname bln
-#' @aliases dblnxpp
-#' @return \code{dblnxpp} gives the exact density using C++
-#' @export
-#'
-dblnxpp <- function(x, size, mean = 0, sd = 1) {
-  invisible(x = NULL)
-}
+# @rdname bln
+# @aliases dblnxpp
+# @return \code{dblnxpp} gives the exact density using C++
+# @export
+#
+# dblnxpp <- function(x, size, mean = 0, sd = 1) {
+#   invisible(x = NULL)
+# }
 
 # Probability function (CDF)
 #' @rdname bln

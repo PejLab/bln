@@ -4,21 +4,15 @@
 \alias{Binomial-logit-normal}
 \alias{bln}
 \alias{dbln}
-\alias{dblnx}
 \alias{dblnpp}
-\alias{dblnxpp}
 \alias{pbln}
 \alias{qbln}
 \alias{rbln}
 \title{The Binomial-Logit-Normal Distribution}
 \usage{
-dbln(x, size, mean = 0, sd = 1)
-
-dblnx(x, size, mean = 0, sd = 1, drop = FALSE)
+dbln(x, size, mean = 0, sd = 1, drop = NULL)
 
 dblnpp(x, size, mean = 0, sd = 1)
-
-dblnxpp(x, size, mean = 0, sd = 1)
 
 pbln(q, size, mean = 0, sd = 1)
 
@@ -35,6 +29,9 @@ rbln(n, size, mean = 0, sd = 1)
 
 \item{sd}{A vector of standard deviations}
 
+\item{drop}{Drop the binomial coefficient? If \code{FALSE}, calculates the
+normalized value. If \code{NULL}, calculates the approximated value.}
+
 \item{p}{A vector of probabilities}
 
 \item{n}{Number of observations, if \code{length(x = n) > 1},
@@ -44,8 +41,6 @@ the length is taken to be the number required}
 \code{dbln} gives the density
 
 \code{dblnpp} gives the density using C++
-
-\code{dblnxpp} gives the exact density using C++
 
 \code{pbln} gives the distribution function
 
@@ -57,7 +52,4 @@ the length is taken to be the number required}
 Density, distribution function, quantile function, and random generation for
 the binomial-logit-normal distribution with mean equal to \code{mean} and
 standard deviation equal to \code{sd}, as well as distribution parameter \code{size}.
-}
-\references{
-\code{dblnx} gives the exact density
 }

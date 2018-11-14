@@ -19,6 +19,9 @@ Collate:
     'internal.R'
     'bln.R'
 RoxygenNote: 6.1.0
+Imports:
+    pracma,
+    stats
 Suggests: 
     testthat,
     knitr,
