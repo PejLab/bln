@@ -1,4 +1,5 @@
 #' @include internal.R
+#' @useDynLib bln
 #'
 NULL
 
@@ -31,7 +32,6 @@ NULL
 #'
 dbln <- function(x, size, mean = 0, sd = 1) {
   # Equalize lengths
-  # length.use <- max(sapply(X = list(x, size, mean, sd), FUN = length))
   length.use <- max.length(x, size, mean, sd)
   x <- rep_len(x = x, length.out = length.use)
   size <- rep_len(x = size, length.out = length.use)
@@ -41,13 +41,13 @@ dbln <- function(x, size, mean = 0, sd = 1) {
   # Some constants
   num.integrate <- 250
   variance <- sd ^ 2
-  # tau <- 2 * pi
+  # Do shit
   rd <- seq.int(from = 0, to = 1, length.out = num.integrate + 1)
   rd <- rd + ((rd[2] - rd[1]) / 2)
   rd <- rd[1:num.integrate]
   too.small <- which(x = variance < 1e-3)
   if (length(x = too.small) > 0) {
-    warning("Variance is less than 1e-3, giving binomial probability")
+    warning("One or more variance values is less than 1e-3, giving binomial probability")
   }
   for (i in 1:length.use) {
     if (i %in% too.small) {
@@ -56,58 +56,89 @@ dbln <- function(x, size, mean = 0, sd = 1) {
       xc <- size[i] - x[i]
       z <- lgamma(x = size[i] + 1) - lgamma(x = x[i] + 1) - lgamma(x = xc + 1)
       z <- z - (log(x = 2 * pi * variance[i]) * 0.5)
-      f <- exp(
-        x = (log(x = rd) * (x[i] - 1)) +
-          (log(x = 1 - rd) * (xc - 1)) -
-          (((logit(x = rd) - mean[i]) ^ 2) / (2 * variance[i])) +
-          z
+      f <- fxpdf(
+        ratio = rd,
+        x = x[i],
+        xc = xc,
+        mean = mean[i],
+        variance = variance[i],
+        z = z
       )
       results[i] <- exp(x = -log(x = num.integrate) + log(x = sum(f)))
     }
   }
-  #   results[too.small] <- dbinom(
-  #     x = x[too.small],
-  #     size = size[too.small],
-  #     prob = logistic(x = mean[too.small])
-  #   )
-  #   x <- x[-too.small]
-  #   size <- size[-too.small]
-  #   mean <- mean[-too.small]
-  #   sd <- sd[-too.small]
-  #   variance <- variance[-too.small]
-  # }
-  # if (length(x = too.small) == length.use) {
-  #   return(results)
-  # }
-  # xc <- size - x
-  # z <- lgamma(x = size + 1) - lgamma(x = x + 1) - lgamma(x = xc + 1)
-  # z <- z - (log(x = tau * variance) * 0.5)
-  # rd <- seq.int(from = 0, to = 1, length.out = num.integrate + 1)
-  # rd <- rd + ((rd[2] - rd[1]) / 2)
-  # rd <- rd[1:num.integrate]
-  # px <- mapply(
-  #   FUN = function(r, x.use, xc.use, mean.use, variance.use, z.use) {
-  #     f <- exp(
-  #       x = (log(x = r) * (x.use - 1)) +
-  #         (log(x = 1 - r) * (xc.use - 1)) -
-  #         (((logit(x = r) - mean.use) ^ 2) / (2 * variance.use)) +
-  #         z.use
-  #     )
-  #     return(exp(x = -log(x = num.integrate) + log(x = sum(f))))
-  #   },
-  #   x.use = x,
-  #   xc.use = xc,
-  #   mean.use = mean,
-  #   variance.use = variance,
-  #   z.use = z,
-  #   MoreArgs = list(r = rd)
-  # )
-  # if (length(x = too.small) > 0) {
-  #   results[-too.small] <- px
-  # } else {
-  #   results <- px
-  # }
   return(results)
+}
+
+#' @rdname bln
+#' @aliases dblnx
+#' @references \code{dblnx} gives the exact density
+#' @export
+#'
+dblnx <- function(x, size, mean = 0, sd = 1, drop = FALSE) {
+  # Equalize lengths
+  length.use <- max.length(x, size, mean, sd)
+  x <- rep_len(x = x, length.out = length.use)
+  size <- rep_len(x = size, length.out = length.use)
+  mean <- rep_len(x = mean, length.out = length.use)
+  sd <- rep_len(x = sd, length.out = length.use)
+  xc <- size - x
+  # Some constants
+  variance <- sd ^ 2
+  # Do shit
+  too.small <- which(x = variance < 1e-3)
+  if (length(x = too.small) > 0) {
+    warning("One or more variance values is less than 1e-3, giving binomial probability")
+  }
+  z <- if (drop) {
+    0
+  } else {
+    lgamma(x = size + 1) - lgamma(x + 1) - lgamma(x = xc + 1)
+  }
+  probs <- mapply(
+    FUN = integrate,
+    x = x,
+    xc = xc,
+    mean = mean,
+    variance = variance,
+    z = z,
+    MoreArgs = list(
+      f = fxpdf,
+      lower = 0,
+      upper = 1,
+      rel.tol = 1e-4,
+      abs.tol = 0
+    )
+  )
+  probs <- 1 / sqrt(x = 2 * pi * variance) * unlist(x = probs[1, ], use.names = FALSE)
+  return(probs)
+}
+
+#' @rdname bln
+#' @aliases dblnpp
+#' @return \code{dblnpp} gives the density using C++
+#' @export
+#'
+dblnpp <- function(x, size, mean = 0, sd = 1) {
+  # Equalize lengths
+  length.use <- max.length(x, size, mean, sd)
+  x <- rep_len(x = x, length.out = length.use)
+  size <- rep_len(x = size, length.out = length.use)
+  mean <- rep_len(x = mean, length.out = length.use)
+  sd <- rep_len(x = sd, length.out = length.use)
+  if (any(sd ^ 2 < 1e-3)) {
+    warning("One or more variance values is less than 1e-3, giving binomial probability")
+  }
+  return(blnpdf(x = x, size = size, mean = mean, sd = sd))
+}
+
+#' @rdname bln
+#' @aliases dblnxpp
+#' @return \code{dblnxpp} gives the exact density using C++
+#' @export
+#'
+dblnxpp <- function(x, size, mean = 0, sd = 1) {
+  invisible(x = NULL)
 }
 
 # Probability function (CDF)
