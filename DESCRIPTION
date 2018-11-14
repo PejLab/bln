@@ -5,7 +5,7 @@ Description: An implementation of the binomial logit normal distribution in R.
 Version: 0.1.0
 Date: 2018-11-07
 Authors@R: c(
-  person(given = 'Pejman', family = 'Mohammadi', email = 'user@example.com', role = 'aut'),
+  person(given = 'Pejman', family = 'Mohammadi', email = 'pejman.m@gmail.com', role = 'aut'),
   person(given = 'Paul', family = 'Hoffman', email = 'phoffman@nygenome.org', role = c('aut', 'cre')),
   person(given = 'Tuuli', family = 'Lappalainen', email = 'tlappalainen@nygenome.org', role = 'aut')
   )
