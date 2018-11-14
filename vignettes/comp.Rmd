@@ -2,7 +2,7 @@
 title: "Comparing BLN PDF in R to Matlab"
 date: "`r Sys.Date()`"
 # output: rmarkdown::html_vignette
-output: html
+output: html_document
 vignette: >
   %\VignetteIndexEntry{Comparing BLN PDF in R to Matlab}
   %\VignetteEngine{knitr::rmarkdown}
@@ -10,11 +10,9 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-# knitr::opts_chunk$set(
-#   collapse = TRUE,
-#   comment = "#>"
-# )
 knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = '#>',
   echo = TRUE,
   tidy = TRUE
 )
@@ -70,8 +68,10 @@ knitr::opts_chunk$set(
 
 ## Beta-Logit-Normal Distribution
 
-```{r setup}
+```{r bln_setup}
+# Load the bln package
 library(bln)
+# Find the included simluations conducted in MATLAB and read them in
 blnfile <- system.file('extdata', 'matlab_simluations.txt', package = 'bln')
 matlab <- read.table(
   file = blnfile,
@@ -82,6 +82,8 @@ matlab <- read.table(
 ```
 
 ```{r r_approx}
+# Using the same x, size (x + xc), mean, and standard deviations
+# run the approximate BLN PDF R code
 system.time(
   expr = r.approx <- dbln(
     x = matlab$x,
@@ -90,15 +92,34 @@ system.time(
     sd = sqrt(x = matlab$v)
   )
 )
-plot(x = r.approx, y = matlab$px)
+plot(
+  x = r.approx, 
+  y = matlab$px, 
+  main = cor(x = r.approx, y = matlab$px)
+)
 ```
 
 ```{r cpp_approx}
-system.time(cpp.approx <- dblnpp(x = matlab$x, size = matlab$x + matlab$xc, mean = matlab$mu, sd = sqrt(x = matlab$v)))
-plot(x = cpp.approx, y = matlab$px)
+# Using the same x, size (x + xc), mean, and standard deviations,
+# run the approximate BLN PDF C++ code
+system.time(
+  expr = cpp.approx <- dblnpp(
+    x = matlab$x, 
+    size = matlab$x + matlab$xc, 
+    mean = matlab$mu, 
+    sd = sqrt(x = matlab$v)
+  )
+)
+plot(
+  x = cpp.approx, 
+  y = matlab$px, 
+  main = cor(x = cpp.approx, y = matlab$px)
+)
 ```
 
 ```{r r_exact}
+# Using the same x, size (x + xc), mean, and standard deviations
+# run the exact BLN PDF R code
 system.time(
   expr = r.exact <- dblnx(
     x = matlab$x,
@@ -107,9 +128,13 @@ system.time(
     sd = sqrt(x = matlab$v)
   )
 )
-plot(x = r.exact, y = matlab$px_acc)
+plot(
+  x = r.exact, 
+  y = matlab$px_acc, 
+  main = cor(x = r.exact, y = matlab$px_acc)
+)
 ```
 
-```{r cpp_exact}
+```{r cpp_exact, echo=FALSE, eval=FALSE}
 NULL
 ```
