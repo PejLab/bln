@@ -16,8 +16,9 @@ NULL
 #' @param size Number of trials
 #' @param mean A vector of means
 #' @param sd A vector of standard deviations
-#' @param drop Drop the binomial coefficient? If \code{FALSE}, calculates the
-#' normalized value. If \code{NULL}, calculates the approximated value.
+#' @param approximate Approximate the integral rather than doing a full calculation.
+#' The approximate mode generally matches the full integration, except in cases
+#' where \code{mean} and \code{sd} are extreme
 #'
 #' @rdname bln
 #' @name Binomial-logit-normal
@@ -33,7 +34,7 @@ NULL
 #' @importFrom stats dbinom
 #' @export
 #'
-dbln <- function(x, size, mean = 0, sd = 1, drop = NULL) {
+dbln <- function(x, size, mean = 0, sd = 1, approximate = TRUE) {
   # Equalize lengths
   length.use <- max.length(x, size, mean, sd)
   x <- rep_len(x = x, length.out = length.use)
@@ -46,15 +47,11 @@ dbln <- function(x, size, mean = 0, sd = 1, drop = NULL) {
   variance <- sd ^ 2
   min.var <- eps()
   xc <- size - x
-  z <- if (isTRUE(x = drop)) {
-    rep_len(x = 0, length.out = length.use)
-  } else {
-    lgamma(x = size + 1) - lgamma(x = x + 1) - lgamma(x = xc + 1)
-  }
+  z <- lgamma(x = size + 1) - lgamma(x = x + 1) - lgamma(x = xc + 1)
   dx <- seq.int(
     from = 0,
     to = 1,
-    length.out = ifelse(test = is.null(x = drop), yes = num.integrate, no = 1000)
+    length.out = ifelse(test = approximate, yes = num.integrate, no = 1000)
   )
   too.small <- which(x = variance < min.var)
   # Do shit
@@ -68,7 +65,7 @@ dbln <- function(x, size, mean = 0, sd = 1, drop = NULL) {
       tpx <- pln(q = dx, mean = mean[i], sd = sd[i])
       lower <- max(dx[tpx < eps()])
       upper <- min(dx[tpx > (1 - eps())])
-      if (is.null(x = drop)) {
+      if (approximate) {
         rd <- seq.int(from = lower, to = upper, length.out = num.integrate + 1)
         rd <- rd + ((rd[2] - rd[1]) / 2)
         rd <- rd[1:(length(x = rd) - 1)]
@@ -101,51 +98,6 @@ dbln <- function(x, size, mean = 0, sd = 1, drop = NULL) {
   return(results)
 }
 
-# @rdname bln
-# @aliases dblnx
-# @references \code{dblnx} gives the exact density
-# @export
-#
-# dblnx <- function(x, size, mean = 0, sd = 1, drop = FALSE) {
-#   # Equalize lengths
-#   length.use <- max.length(x, size, mean, sd)
-#   x <- rep_len(x = x, length.out = length.use)
-#   size <- rep_len(x = size, length.out = length.use)
-#   mean <- rep_len(x = mean, length.out = length.use)
-#   sd <- rep_len(x = sd, length.out = length.use)
-#   xc <- size - x
-#   # Some constants
-#   variance <- sd ^ 2
-#   min.var <- eps()
-#   # Do shit
-#   too.small <- which(x = variance < min.var)
-#   if (length(x = too.small) > 0) {
-#     warning("One or more variance values is less than ", min.var, ", giving binomial probability")
-#   }
-#   z <- if (drop) {
-#     0
-#   } else {
-#     lgamma(x = size + 1) - lgamma(x + 1) - lgamma(x = xc + 1)
-#   }
-#   probs <- mapply(
-#     FUN = integrate,
-#     x = x,
-#     xc = xc,
-#     mean = mean,
-#     variance = variance,
-#     z = z,
-#     MoreArgs = list(
-#       f = fxpdf,
-#       lower = 0,
-#       upper = 1,
-#       rel.tol = 1e-4,
-#       abs.tol = 0
-#     )
-#   )
-#   probs <- unlist(x = probs[1, ], use.names = FALSE)
-#   return(1 / sqrt(x = 2 * pi * variance) * probs)
-# }
-
 #' @rdname bln
 #' @aliases dblnpp
 #' @return \code{dblnpp} gives the density using C++
@@ -164,15 +116,6 @@ dblnpp <- function(x, size, mean = 0, sd = 1) {
   }
   return(blnpdf(x = x, size = size, mean = mean, sd = sd))
 }
-
-# @rdname bln
-# @aliases dblnxpp
-# @return \code{dblnxpp} gives the exact density using C++
-# @export
-#
-# dblnxpp <- function(x, size, mean = 0, sd = 1) {
-#   invisible(x = NULL)
-# }
 
 # Probability function (CDF)
 #' @rdname bln

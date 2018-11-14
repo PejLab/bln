@@ -10,7 +10,7 @@
 \alias{rbln}
 \title{The Binomial-Logit-Normal Distribution}
 \usage{
-dbln(x, size, mean = 0, sd = 1, drop = NULL)
+dbln(x, size, mean = 0, sd = 1, approximate = TRUE)
 
 dblnpp(x, size, mean = 0, sd = 1)
 
@@ -29,8 +29,9 @@ rbln(n, size, mean = 0, sd = 1)
 
 \item{sd}{A vector of standard deviations}
 
-\item{drop}{Drop the binomial coefficient? If \code{FALSE}, calculates the
-normalized value. If \code{NULL}, calculates the approximated value.}
+\item{approximate}{Approximate the integral rather than doing a full calculation.
+The approximate mode generally matches the full integration, except in cases
+where \code{mean} and \code{sd} are extreme}
 
 \item{p}{A vector of probabilities}
 

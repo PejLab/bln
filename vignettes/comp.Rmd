@@ -90,12 +90,12 @@ system.time(
     size = matlab$x + matlab$xc,
     mean = matlab$mu,
     sd = sqrt(x = matlab$v),
-    drop = NULL
+    approximate = TRUE
   )
 )
 plot(
-  x = r.approx, 
-  y = matlab$px, 
+  x = log(x = r.approx), 
+  y = log(x = matlab$px), 
   main = cor(x = r.approx, y = matlab$px)
 )
 ```
@@ -127,12 +127,12 @@ system.time(
     size = matlab$x + matlab$xc,
     mean = matlab$mu,
     sd = sqrt(x = matlab$v),
-    drop = FALSE
+    approximate = FALSE
   )
 )
 plot(
-  x = r.exact, 
-  y = matlab$px_acc, 
+  x = log(x = r.exact), 
+  y = log(x = matlab$px_acc), 
   main = cor(x = r.exact, y = matlab$px_acc)
 )
 ```
