@@ -9,8 +9,8 @@ Authors@R: c(
   person(given = 'Paul', family = 'Hoffman', email = 'phoffman@nygenome.org', role = c('aut', 'cre')),
   person(given = 'Tuuli', family = 'Lappalainen', email = 'tlappalainen@nygenome.org', role = 'aut')
   )
-URL: https://github.com/mojaveazure/bln
-BugReports: https://github.com/mojaveazure/bln/issues
+URL: https://github.com/PejLab/bln
+BugReports: https://github.com/PejLab/bln/issues
 License: MIT
 Encoding: UTF-8
 LazyData: true
