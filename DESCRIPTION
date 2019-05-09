@@ -11,7 +11,7 @@ Authors@R: c(
   )
 URL: https://github.com/PejLab/bln
 BugReports: https://github.com/PejLab/bln/issues
-License: MIT
+License: Apache License | file LICENSE
 Encoding: UTF-8
 LazyData: true
 Collate: 
