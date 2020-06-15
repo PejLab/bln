@@ -3,7 +3,9 @@
 
 
 
-An implementation of the binomial-logit-normal distribution in R. BLN can be used as a generative model for Allelic expression data. See our [preprint](https://www.biorxiv.org/content/biorxiv/early/2019/05/09/632794.full.pdf) for derivations and use.
+An implementation of the binomial-logit-normal distribution in R. BLN is an interpretable way to model overdispersed count data.
+
+BLN can be used as a generative model for Allelic expression data. See and cite our [paper](https://science.sciencemag.org/content/366/6463/351.abstract) for derivations and use.
 
 ## Installation
 
