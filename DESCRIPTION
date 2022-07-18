@@ -21,7 +21,10 @@ Collate:
 RoxygenNote: 6.1.0
 Imports:
     pracma,
+    Rcpp,
     stats
+LinkingTo:
+    Rcpp
 Suggests: 
     testthat,
     knitr,
